@@ -584,6 +584,53 @@ class AccessInfoV3(AccessInfo):
     def domain_scoped(self):
         return 'domain' in self
 
+    # add sid & sip part 
+    @property
+    def sid_name(self):
+        sid = self.get('sid')
+        if sid:
+            return sid['name']
+
+    @property
+    def sid_id(self):
+        sid = self.get('sid')
+        if sid:
+            return sid['id']
+
+    @property
+    def sip_id(self):
+        sip = self.get('sip')
+        if sip:
+            return sip['id']
+
+    @property
+    def sip_sid_id(self):
+        sip = self.get('sip')
+        if sip:
+            return sip['sid']['id']
+
+    @property
+    def sip_sid_name(self):
+        sip = self.get('sip')
+        if sip:
+            return sip['sid']['name']
+
+    @property
+    def sip_name(self):
+        sip = self.get('sip')
+        if sip:
+            return sip['name']
+
+    @property
+    def sip_scoped(self):
+        return 'sip' in self
+
+    @property
+    def sid_scoped(self):
+        return 'sid' in self
+
+    # end of sid & sip part 
+
     @property
     def trust_id(self):
         return self.get('OS-TRUST:trust', {}).get('id')

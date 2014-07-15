@@ -20,14 +20,14 @@ from keystoneclient import utils
 import traceback
 
 
-class Project(base.Resource):
-    """Represents an Identity project.
+class Sip(base.Resource):
+    """Represents an Identity sip.
 
     Attributes:
-        * id: a uuid that identifies the project
-        * name: project name
-        * description: project description
-        * enabled: boolean to indicate if project is enabled
+        * id: a uuid that identifies the sip
+        * name: sip name
+        * description: sip description
+        * enabled: boolean to indicate if sip is enabled
 
     """
     @utils.positional(enforcement=utils.positional.WARN)
@@ -49,53 +49,53 @@ class Project(base.Resource):
         return retval
 
 
-class ProjectManager(base.CrudManager):
-    """Manager class for manipulating Identity projects."""
-    resource_class = Project
-    collection_key = 'projects'
-    key = 'project'
+class SipManager(base.CrudManager):
+    """Manager class for manipulating Identity sips."""
+    resource_class = Sip
+    collection_key = 'sips'
+    key = 'sip'
 
     @utils.positional(1, enforcement=utils.positional.WARN)
-    def create(self, name, domain, description=None, enabled=True, **kwargs):
-        return super(ProjectManager, self).create(
-            domain_id=base.getid(domain),
+    def create(self, name, sid, description=None, enabled=True, **kwargs):
+        return super(SipManager, self).create(
+            sid_id=base.getid(sid),
             name=name,
             description=description,
             enabled=enabled,
             **kwargs)
 
     @utils.positional(enforcement=utils.positional.WARN)
-    def list(self, domain=None, user=None, **kwargs):
-        """List projects.
-   	traceback.print_stack()
+    def list(self, sid=None, user=None, **kwargs):
+        """List sips.
 
-        If domain or user are provided, then filter projects with
+        If sid or user are provided, then filter sips with
         those attributes.
 
-        If ``**kwargs`` are provided, then filter projects with
+        If ``**kwargs`` are provided, then filter sips with
         attributes matching ``**kwargs``.
         """
+   	#traceback.print_stack()
         base_url = '/users/%s' % base.getid(user) if user else None
-        return super(ProjectManager, self).list(
+        return super(SipManager, self).list(
             base_url=base_url,
-            domain_id=base.getid(domain),
+            sid_id=base.getid(sid),
             **kwargs)
 
-    def get(self, project):
-        return super(ProjectManager, self).get(
-            project_id=base.getid(project))
+    def get(self, sip):
+        return super(SipManager, self).get(
+            sip_id=base.getid(sip))
 
     @utils.positional(enforcement=utils.positional.WARN)
-    def update(self, project, name=None, domain=None, description=None,
+    def update(self, sip, name=None, sid=None, description=None,
                enabled=None, **kwargs):
-        return super(ProjectManager, self).update(
-            project_id=base.getid(project),
-            domain_id=base.getid(domain),
+        return super(SipManager, self).update(
+            sip_id=base.getid(sip),
+            sid_id=base.getid(sid),
             name=name,
             description=description,
             enabled=enabled,
             **kwargs)
 
-    def delete(self, project):
-        return super(ProjectManager, self).delete(
-            project_id=base.getid(project))
+    def delete(self, sip):
+        return super(SipManager, self).delete(
+            sip_id=base.getid(sip))

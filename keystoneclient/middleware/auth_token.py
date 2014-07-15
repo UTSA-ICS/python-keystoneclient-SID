@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import traceback
+
 """
 TOKEN-BASED AUTH MIDDLEWARE
 
@@ -661,6 +663,12 @@ class AuthProtocol(object):
             'X-Project-Name',
             'X-Project-Domain-Id',
             'X-Project-Domain-Name',
+            'X-Sid-Id',
+            'X-Sid-Name',
+            'X-Sip-Id',
+            'X-Sip-Name',
+            'X-Sip-Sid-Id',
+            'X-Sip-Sid-Name',
             'X-User-Id',
             'X-User-Name',
             'X-User-Domain-Id',
@@ -908,6 +916,7 @@ class AuthProtocol(object):
         :raise InvalidUserToken when unable to parse token object
 
         """
+	#print("!!!!!!!! _build_user_headers: token_info=", token_info)
         auth_ref = access.AccessInfo.factory(body=token_info)
         roles = ','.join(auth_ref.role_names)
 
@@ -922,6 +931,12 @@ class AuthProtocol(object):
             'X-Project-Name': auth_ref.project_name,
             'X-Project-Domain-Id': auth_ref.project_domain_id,
             'X-Project-Domain-Name': auth_ref.project_domain_name,
+            'X-Sid-Id': auth_ref.sid_id,
+            'X-Sid-Name': auth_ref.sid_name,
+            'X-Sip-Id': auth_ref.sip_id,
+            'X-Sip-Name': auth_ref.sip_name,
+            'X-Sip-Sid-Id': auth_ref.sip_sid_id,
+            'X-Sip-Sid-Name': auth_ref.sip_sid_name,
             'X-User-Id': auth_ref.user_id,
             'X-User-Name': auth_ref.username,
             'X-User-Domain-Id': auth_ref.user_domain_id,
@@ -938,6 +953,9 @@ class AuthProtocol(object):
         self.LOG.debug('Received request from user: %s with project_id : %s'
                        ' and roles: %s ',
                        auth_ref.user_id, auth_ref.project_id, roles)
+        self.LOG.debug('Received request from user: %s with sip_id : %s'
+                       ' and roles: %s ',
+                       auth_ref.user_id, auth_ref.sip_id, roles)
 
         if self.include_service_catalog and auth_ref.has_service_catalog():
             catalog = auth_ref.service_catalog.get_data()
