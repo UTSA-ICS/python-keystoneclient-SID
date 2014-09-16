@@ -13,7 +13,6 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import traceback
 
 import logging
 
@@ -113,7 +112,6 @@ class UserManager(base.CrudManager):
     def update(self, user, name=None, domain=None, project=None, password=None,
                email=None, description=None, enabled=None,
                default_project=None, **kwargs):
-	traceback.print_stack()
         """Update a user.
 
         .. warning::

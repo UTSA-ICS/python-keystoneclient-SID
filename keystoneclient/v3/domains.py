@@ -13,6 +13,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import traceback
 
 from keystoneclient import base
 from keystoneclient import utils
@@ -47,6 +48,7 @@ class DomainManager(base.CrudManager):
             domain_id=base.getid(domain))
 
     def list(self, **kwargs):
+	#traceback.print_stack()
         """List domains.
 
         ``**kwargs`` allows filter criteria to be passed where

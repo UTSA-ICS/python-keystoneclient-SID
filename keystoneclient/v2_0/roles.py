@@ -14,7 +14,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import traceback
 from keystoneclient import base
 
 
@@ -57,7 +56,6 @@ class RoleManager(base.ManagerWithFind):
             return self._list("/users/%s/roles" % user_id, "roles")
 
     def add_user_role(self, user, role, tenant=None):
-  	traceback.print_stack()
         """Adds a role to a user.
 
         If tenant is specified, the role is added just for that tenant,

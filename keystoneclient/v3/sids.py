@@ -13,6 +13,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import traceback
 
 from keystoneclient import base
 from keystoneclient import utils
@@ -23,8 +24,28 @@ class Sid(base.Resource):
 
     Attributes:
         * id: a uuid that identifies the sid
+        * name: sid name
+        * description: sid description
+        * enabled: boolean to indicate if sid is enabled
 
     """
+#    @utils.positional(enforcement=utils.positional.WARN)
+#    def update(self, name=None, description=None, enabled=None):
+#        kwargs = {
+#            'name': name if name is not None else self.name,
+#            'description': (description
+#                            if description is not None
+#                            else self.description),
+#            'enabled': enabled if enabled is not None else self.enabled,
+#        }
+#
+#        try:
+#            retval = self.manager.update(self.id, **kwargs)
+#            self = retval
+#        except Exception:
+#            retval = None
+#
+#        return retval
     pass
 
 
@@ -35,39 +56,47 @@ class SidManager(base.CrudManager):
     key = 'sid'
 
     @utils.positional(1, enforcement=utils.positional.WARN)
-    def create(self, name, description=None, enabled=True, **kwargs):
+    def create(self, name, members, description=None, enabled=True, **kwargs):
+	#print("keystone client: members=", members)
         return super(SidManager, self).create(
             name=name,
+            members=members,
             description=description,
             enabled=enabled,
             **kwargs)
 
-    def get(self, sid):
-        return super(SidManager, self).get(
-            sid_id=base.getid(sid))
-
-    def list(self, **kwargs):
+    @utils.positional(enforcement=utils.positional.WARN)
+    def list(self, domain=None, user=None, **kwargs):
+	#traceback.print_stack()
         """List sids.
 
-        ``**kwargs`` allows filter criteria to be passed where
-         supported by the server.
+        If domain or user are provided, then filter sids with
+        those attributes.
+
+        If ``**kwargs`` are provided, then filter sids with
+        attributes matching ``**kwargs``.
         """
-        # Ref bug #1267530 we have to pass 0 for False to get the expected
-        # results on all keystone versions
-        if kwargs.get('enabled') is False:
-            kwargs['enabled'] = 0
-        return super(SidManager, self).list(**kwargs)
+        base_url = '/users/%s' % base.getid(user) if user else None
+        return super(SidManager, self).list(
+            base_url=base_url,
+            domain_id=base.getid(domain),
+            **kwargs)
+
+    def get(self, sidinfo):
+        return super(SidManager, self).get(
+            sid_id=base.getid(sidinfo))
 
     @utils.positional(enforcement=utils.positional.WARN)
-    def update(self, sid, name=None,
-               description=None, enabled=True, **kwargs):
+    def update(self, sid, name=None, domain=None, description=None,
+               enabled=None, **kwargs):
         return super(SidManager, self).update(
             sid_id=base.getid(sid),
+            domain_id=base.getid(domain),
             name=name,
             description=description,
             enabled=enabled,
             **kwargs)
 
-    def delete(self, sid):
+    def delete(self, sidinfo):
         return super(SidManager, self).delete(
-            sid_id=base.getid(sid))
+            sid_id=base.getid(sidinfo))

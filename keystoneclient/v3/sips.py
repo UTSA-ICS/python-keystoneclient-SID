@@ -13,11 +13,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import traceback
 
 from keystoneclient import base
 from keystoneclient import utils
-
-import traceback
 
 
 class Sip(base.Resource):
@@ -57,6 +56,9 @@ class SipManager(base.CrudManager):
 
     @utils.positional(1, enforcement=utils.positional.WARN)
     def create(self, name, sid, description=None, enabled=True, **kwargs):
+	#print("keystone client: sid=", sid)
+	#print("keystone client: sid_id=", base.getid(sid))
+	#traceback.print_stack()
         return super(SipManager, self).create(
             sid_id=base.getid(sid),
             name=name,
@@ -66,6 +68,7 @@ class SipManager(base.CrudManager):
 
     @utils.positional(enforcement=utils.positional.WARN)
     def list(self, sid=None, user=None, **kwargs):
+	#traceback.print_stack()
         """List sips.
 
         If sid or user are provided, then filter sips with
@@ -74,14 +77,14 @@ class SipManager(base.CrudManager):
         If ``**kwargs`` are provided, then filter sips with
         attributes matching ``**kwargs``.
         """
-   	#traceback.print_stack()
         base_url = '/users/%s' % base.getid(user) if user else None
         return super(SipManager, self).list(
             base_url=base_url,
             sid_id=base.getid(sid),
             **kwargs)
 
-    def get(self, sip):
+    def get(self, sip, sid=None):
+	#traceback.print_stack()
         return super(SipManager, self).get(
             sip_id=base.getid(sip))
 

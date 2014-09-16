@@ -13,11 +13,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import traceback
 
 from keystoneclient import base
 from keystoneclient import utils
-
-import traceback
 
 
 class Project(base.Resource):
@@ -57,6 +56,9 @@ class ProjectManager(base.CrudManager):
 
     @utils.positional(1, enforcement=utils.positional.WARN)
     def create(self, name, domain, description=None, enabled=True, **kwargs):
+	#print("keystone client: domain=", domain)
+	#print("keystone client: domain_id=", base.getid(domain))
+	#traceback.print_stack()
         return super(ProjectManager, self).create(
             domain_id=base.getid(domain),
             name=name,
@@ -66,8 +68,8 @@ class ProjectManager(base.CrudManager):
 
     @utils.positional(enforcement=utils.positional.WARN)
     def list(self, domain=None, user=None, **kwargs):
+	#traceback.print_stack()
         """List projects.
-   	traceback.print_stack()
 
         If domain or user are provided, then filter projects with
         those attributes.
@@ -81,7 +83,8 @@ class ProjectManager(base.CrudManager):
             domain_id=base.getid(domain),
             **kwargs)
 
-    def get(self, project):
+    def get(self, project, domain=None):
+	#traceback.print_stack()
         return super(ProjectManager, self).get(
             project_id=base.getid(project))
 

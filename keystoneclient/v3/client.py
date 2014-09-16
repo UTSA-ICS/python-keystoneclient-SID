@@ -25,16 +25,16 @@ from keystoneclient.v3.contrib import oauth1
 from keystoneclient.v3.contrib import trusts
 from keystoneclient.v3 import credentials
 from keystoneclient.v3 import domains
-from keystoneclient.v3 import sids
 from keystoneclient.v3 import endpoints
 from keystoneclient.v3 import groups
 from keystoneclient.v3 import policies
 from keystoneclient.v3 import projects
-from keystoneclient.v3 import sips
 from keystoneclient.v3 import regions
 from keystoneclient.v3 import roles
 from keystoneclient.v3 import services
 from keystoneclient.v3 import users
+from keystoneclient.v3 import sids
+from keystoneclient.v3 import sips
 
 
 _logger = logging.getLogger(__name__)
@@ -101,19 +101,19 @@ class Client(httpclient.HTTPClient):
         self.credentials = credentials.CredentialManager(self)
         self.endpoints = endpoints.EndpointManager(self)
         self.domains = domains.DomainManager(self)
-        self.sids = sids.SidManager(self)
         self.federation = federation.FederationManager(self)
         self.groups = groups.GroupManager(self)
         self.oauth1 = oauth1.create_oauth_manager(self)
         self.policies = policies.PolicyManager(self)
         self.projects = projects.ProjectManager(self)
-        self.sips = sips.SipManager(self)
         self.regions = regions.RegionManager(self)
         self.roles = roles.RoleManager(self)
         self.services = services.ServiceManager(self)
         self.users = users.UserManager(self)
         self.trusts = trusts.TrustManager(self)
         self.endpoint_filter = endpoint_filter.EndpointFilterManager(self)
+        self.sids = sids.SidManager(self)
+        self.sips = sips.SipManager(self)
 
         # DEPRECATED: if session is passed then we go to the new behaviour of
         # authenticating on the first required call.

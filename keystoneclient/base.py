@@ -18,7 +18,6 @@
 """
 Base utilities to build API operation managers and objects on top of.
 """
-import traceback
 
 import abc
 import functools
@@ -304,6 +303,7 @@ class CrudManager(Manager):
         if entity_id is not None:
             url += '/%s' % entity_id
 
+	#print("keystone client/base.py: build_url: url=", url)
         return url
 
     @filter_kwargs

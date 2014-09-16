@@ -57,34 +57,17 @@ class RoleManager(base.CrudManager):
 
         return base_url % params
 
-    def _require_domain_xor_project(self, domain, project):
-        if domain and project:
-            msg = 'Specify either a domain or project, not both'
-            raise exceptions.ValidationError(msg)
-        elif not (domain or project):
-            msg = 'Must specify either a domain or project'
-            raise exceptions.ValidationError(msg)
-
-    def _require_user_xor_group(self, user, group):
-        if user and group:
-            msg = 'Specify either a user or group, not both'
-            raise exceptions.ValidationError(msg)
-        elif not (user or group):
-            msg = 'Must specify either a user or group'
-            raise exceptions.ValidationError(msg)
-
-    # add sid & sip role assignment part
-    def _role_grants_base_url_4sip(self, user, group, sid, sip):
+    def _role_grants_base_url_sid(self, user, group, sid, sip):
         # When called, we have already checked that only one of user & group
         # and one of sid & sip have been specified
         params = {}
-        
+
         if sip:
-            params['sip_id'] = base.getid(sip)
-            base_url = '/sips/%(sip_id)s'
+            params['project_id'] = base.getid(sip)
+            base_url = '/sips/%(project_id)s'
         elif sid:
-            params['sid_id'] = base.getid(sid)
-            base_url = '/sids/%(sid_id)s'
+            params['domain_id'] = base.getid(sid)
+            base_url = '/sids/%(domain_id)s'
 
         if user:
             params['user_id'] = base.getid(user)
@@ -95,6 +78,15 @@ class RoleManager(base.CrudManager):
 
         return base_url % params
 
+
+    def _require_domain_xor_project(self, domain, project):
+        if domain and project:
+            msg = 'Specify either a domain or project, not both'
+            raise exceptions.ValidationError(msg)
+        elif not (domain or project):
+            msg = 'Must specify either a domain or project'
+            raise exceptions.ValidationError(msg)
+
     def _require_sid_xor_sip(self, sid, sip):
         if sid and sip:
             msg = 'Specify either a sid or sip, not both'
@@ -102,8 +94,14 @@ class RoleManager(base.CrudManager):
         elif not (sid or sip):
             msg = 'Must specify either a sid or sip'
             raise exceptions.ValidationError(msg)
-    # end of sid & sip part
 
+    def _require_user_xor_group(self, user, group):
+        if user and group:
+            msg = 'Specify either a user or group, not both'
+            raise exceptions.ValidationError(msg)
+        elif not (user or group):
+            msg = 'Must specify either a user or group'
+            raise exceptions.ValidationError(msg)
 
     @utils.positional(1, enforcement=utils.positional.WARN)
     def create(self, name, **kwargs):
@@ -161,6 +159,16 @@ class RoleManager(base.CrudManager):
             role_id=base.getid(role))
 
     @utils.positional(enforcement=utils.positional.WARN)
+    def grant_sid(self, role, user=None, group=None, sid=None, sip=None):
+        """Grants a role to a user or group on a sid or sip."""
+        self._require_domain_xor_project(sid, sip)
+        self._require_user_xor_group(user, group)
+
+        return super(RoleManager, self).put(
+            base_url=self._role_grants_base_url_sid(user, group, sid, sip),
+            role_id=base.getid(role))
+
+    @utils.positional(enforcement=utils.positional.WARN)
     def check(self, role, user=None, group=None, domain=None, project=None):
         """Checks if a user or group has a role on a domain or project."""
         self._require_domain_xor_project(domain, project)
@@ -179,36 +187,3 @@ class RoleManager(base.CrudManager):
         return super(RoleManager, self).delete(
             base_url=self._role_grants_base_url(user, group, domain, project),
             role_id=base.getid(role))
- 
-
-    # for sid & sip 
-    @utils.positional(enforcement=utils.positional.WARN)
-    def grant4sip(self, role, user=None, group=None, sid=None, sip=None):
-        """Grants a role to a user or group on a sid or sip."""
-        self._require_sid_xor_sip(sid, sip)
-        self._require_user_xor_group(user, group)
-
-        return super(RoleManager, self).put(
-            base_url=self._role_grants_base_url_4sip(user, group, sid, sip),
-            role_id=base.getid(role))
-
-    @utils.positional(enforcement=utils.positional.WARN)
-    def check4sip(self, role, user=None, group=None, sid=None, sip=None):
-        """Checks if a user or group has a role on a sid or sip."""
-        self._require_sid_xor_sip(sid, sip)
-        self._require_user_xor_group(user, group)
-
-        return super(RoleManager, self).head(
-            base_url=self._role_grants_base_url_4sip(user, group, sid, sip),
-            role_id=base.getid(role))
-
-    @utils.positional(enforcement=utils.positional.WARN)
-    def revoke4sip(self, role, user=None, group=None, sid=None, sip=None):
-        """Revokes a role from a user or group on a sid or sip."""
-        self._require_sid_xor_sip(sid, sip)
-        self._require_user_xor_group(user, group)
-
-        return super(RoleManager, self).delete(
-            base_url=self._role_grants_base_url_4sip(user, group, sid, sip),
-            role_id=base.getid(role))
-
